@@ -5,28 +5,28 @@ The data stored is encapsulated in "Components", which have only data-members.
 The interface of the various parts is defined below.
 
 EntityManager {
-	
+
 	addComponent(entity_id, component_instance)
 	Adds a component object to the database, associated with the entity_id
-	
-	
+
+
 	removeComponent(entity_id, component_type)
 	Removes a component object from the database if the entity_id has such a component
-	
+
 	Does not do any kind of data tear-down.  This method simply makes that component
 	unavailable from the database.
-	
-	
+
+
 	getPairs(component_type)
 	Returns a list of pairs of entity_id's and components for a given component type.
 	Alleviates the need of doing a reverse look-up to get the id of an entity with
 	a certain kind of component.
-	
-	
+
+
 	getComponentForEntity(entity_id, component_type)
 	Returns the component_type component for the given entity_id.  Returns None if there
 	is no component of that type associated with that id.
-	
+
 }
 
 Entity {
@@ -42,11 +42,11 @@ Component {
 	data1
 	data2
 	data3
-	
+
 	Arbitrary data members.  May contain a custom initializer but should not
 	have any other methods, especially any that modify state beyond simple getters/setters
 	with validation.
-	
+
 	Might be good to define factory methods at the class level for each component type.
 
 }
@@ -58,12 +58,12 @@ System {
 	update(dt, entity_manager)
 	Called every frame by the SystemManager.
 	The system can query the database for components and operate on them.
-	
+
 	This is where the logic of the game is implemented.
-	
-	
+
+
 	Each System subclass is responsible for a narrow set of operations.  Should only do the minimum necessary to make a certain feature work.
-	
+
 	No persistent references should be made to things from the database unless you have	a really, really good reason.  Things are likely to come and go from the database.
 
 }
@@ -71,21 +71,21 @@ System {
 SystemManager {
 
 	initializer(entity_manager)
-	Creates a new SystemManager.  Requires a reference to an EntityManager so that the systems can get the required components.  
-	
+	Creates a new SystemManager.  Requires a reference to an EntityManager so that the systems can get the required components.
+
 	addSystem(system_instance, priority)
-	Adds a system instance to the manager.  It will be updated according the priority passed in.  
+	Adds a system instance to the manager.  It will be updated according the priority passed in.
 	Will throw an Error if a system of that type is already present.
-	
+
 	removeSystem(system_type)
 	Removes a given system type from the manager.
-	
+
 	update(dt)
 	The SystemManager goes through its list of Systems and calls their update methods.
 	The list is sorted so systems get updated in their intended priority.
-	
+
 	This method is called externally by the game-loop machinery.
-	
+
 }
 
 database format:
@@ -99,7 +99,7 @@ d = {
 				},
 	comp_type_2 : {
 				id_1 : comp_instance_3,
-				id_2 : comp_instance_4		
+				id_2 : comp_instance_4
 				},
 }
 

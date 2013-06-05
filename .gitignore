@@ -1,9 +1,10 @@
+# Python
 *.py[cod]
 
-# C extensions
+## C extensions
 *.so
 
-# Packages
+## Packages
 *.egg
 *.egg-info
 dist
@@ -19,21 +20,31 @@ lib
 lib64
 __pycache__
 
-# Installer logs
+## Installer logs
 pip-log.txt
 
-# Unit test / coverage reports
+## Unit test / coverage reports
 .coverage
 .tox
 nosetests.xml
 
-# Translations
+## Translations
 *.mo
 
-# Mr Developer
+## Mr Developer
 .mr.developer.cfg
 .project
 .pydevproject
 
 # Mac file-system crud
 .DS_Store
+
+# IDE configs
+.ropeproject
+.project
+.pydevproject
+.settings
+
+# paver-generated files
+/setup.py
+/paver-minilib.zip
