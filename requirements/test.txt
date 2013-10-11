@@ -1,4 +1,5 @@
 # Packages required to test the project
+--requirement run.txt
 
 paver
 flake8

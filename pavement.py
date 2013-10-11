@@ -1,9 +1,11 @@
 # -*- coding: utf-8; -*-
 
 from __future__ import print_function
+
 import os
 import sys
 import time
+
 import subprocess
 
 ## Python 2.6 subprocess.check_output compatibility. Thanks Greg Hewgill!
@@ -18,10 +20,8 @@ if 'check_output' not in dir(subprocess):
         return out
     subprocess.check_output = check_output
 
-from setuptools import find_packages
-from paver.easy import options, task, Bunch, needs
+from paver.easy import options, task, needs, consume_args
 from paver.setuputils import install_distutils_tasks
-import paver.doctools
 
 try:
     import colorama
@@ -33,39 +33,49 @@ except ImportError:
     pass
 
 sys.path.append('.')
-from ecs import metadata
+from setup import setup_dict
 
 ## Constants
 CODE_DIRECTORY = 'ecs'
+DOCS_DIRECTORY = 'docs'
 TESTS_DIRECTORY = 'tests'
+PYTEST_FLAGS = ['--doctest-modules']
 
 ## Miscellaneous helper functions
 
 
-# Credit: <http://packages.python.org/an_example_pypi_project/setuptools.html>
-#
-# This is a utility function to read the README file used for the
-# long_description.  It's nice, because now 1) we have a top level
-# README file and 2) it's easier to type in the README file than to
-# put a raw string in below ...
-def read(filename):
-    """Return the contents of a file name.
-
-    :param filename: name of the file
-    :type filename: :class:`str`
-    :return: contents of file
-    :rtype: :class:`str`
-    """
-    with open(os.path.join(os.path.dirname(__file__), filename)) as f:
-        contents = f.read()
-    return contents
-
-
 def get_project_files():
+    """Retrieve a list of project files, ignoring hidden files.
+
+    :return: sorted list of project files
+    :rtype: :class:`list`
+    """
+    if is_git_project():
+        return get_git_project_files()
+
+    project_files = []
+    for top, subdirs, files in os.walk('.'):
+        for subdir in subdirs:
+            if subdir.startswith('.'):
+                subdirs.remove(subdir)
+
+        for f in files:
+            if f.startswith('.'):
+                continue
+            project_files.append(os.path.join(top, f))
+
+    return project_files
+
+
+def is_git_project():
+    return os.path.isdir('.git')
+
+
+def get_git_project_files():
     """Retrieve a list of all non-ignored files, including untracked files,
     excluding deleted files.
 
-    :return: sorted list of project files
+    :return: sorted list of git project files
     :rtype: :class:`list`
     """
     cached_and_untracked_files = git_ls_files(
@@ -90,6 +100,24 @@ def git_ls_files(*cmd_args):
     cmd = ['git', 'ls-files']
     cmd.extend(cmd_args)
     return set(subprocess.check_output(cmd).splitlines())
+
+
+def print_passed():
+    # generated on http://patorjk.com/software/taag/#p=display&f=Small&t=PASSED
+    print_success_message(r'''  ___  _   ___ ___ ___ ___
+ | _ \/_\ / __/ __| __|   \
+ |  _/ _ \\__ \__ \ _|| |) |
+ |_|/_/ \_\___/___/___|___/
+''')
+
+
+def print_failed():
+    # generated on http://patorjk.com/software/taag/#p=display&f=Small&t=FAILED
+    print_failure_message(r'''  ___ _   ___ _    ___ ___
+ | __/_\ |_ _| |  | __|   \
+ | _/ _ \ | || |__| _|| |) |
+ |_/_/ \_\___|____|___|___/
+''')
 
 
 def print_success_message(message):
@@ -119,48 +147,27 @@ def print_failure_message(message):
         print(message, file=sys.stderr)
 
 
-options(
-    # see here for more options:
-    # <http://packages.python.org/distribute/setuptools.html>
-    setup=dict(
-        name=metadata.package,
-        version=metadata.version,
-        author=metadata.authors[0],
-        author_email=metadata.emails[0],
-        maintainer=metadata.authors[0],
-        maintainer_email=metadata.emails[0],
-        url=metadata.url,
-        description=metadata.description,
-        long_description=read('README.md'),
-        download_url=metadata.url,
-        # Find a list of classifiers here:
-        # <http://pypi.python.org/pypi?%3Aaction=list_classifiers>
-        classifiers=[
-            'Development Status :: 3 - Alpha',
-            'Intended Audience :: Developers',
-            'License :: OSI Approved :: MIT License',
-            'Natural Language :: English',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Topic :: Games/Entertainment',
-            'Topic :: Software Development :: Libraries :: Python Modules',
-        ],
-        packages=find_packages(),
-        install_requires=[],
-        zip_safe=False,  # don't use eggs
-    ),
-    sphinx=Bunch(
-        builddir='build',
-        sourcedir='source',
-    ),
-    minilib=Bunch(
-        extra_files=['doctools'],
-    ),
-)
+options(setup=setup_dict)
 
 install_distutils_tasks()
 
 ## Task-related functions
+
+
+def _doc_make(*make_args):
+    """Run make in sphinx' docs directory.
+
+    :return: exit code
+    """
+    if sys.platform == 'win32':
+        # Windows
+        make_cmd = ['make.bat']
+    else:
+        # Linux, Mac OS X, and others
+        make_cmd = ['make']
+    make_cmd.extend(make_args)
+
+    return subprocess.call(make_cmd, cwd=DOCS_DIRECTORY)
 
 
 def _lint():
@@ -168,11 +175,13 @@ def _lint():
     # Flake8 doesn't have an easy way to run checks using a Python function, so
     # just fork off another process to do it.
 
-    git_python_files = filter(
-        lambda filename: filename.endswith('.py'),
-        get_project_files())
+    # Python 3 compat:
+    # - The result of subprocess call outputs are byte strings, meaning we need
+    #   to pass a byte string to endswith.
+    project_python_files = [filename for filename in get_project_files()
+                            if filename.endswith(b'.py')]
     retcode = subprocess.call(
-        ['flake8', '--max-complexity=10'] + git_python_files)
+        ['flake8', '--max-complexity=10'] + project_python_files)
     if retcode == 0:
         print_success_message('No style errors')
     return retcode
@@ -186,7 +195,7 @@ def _test():
     import pytest
     # This runs the unit tests.
     # It also runs doctest, but only on the modules in TESTS_DIRECTORY.
-    return pytest.main(['--doctest-modules', TESTS_DIRECTORY])
+    return pytest.main(PYTEST_FLAGS + [TESTS_DIRECTORY])
 
 
 def _test_all():
@@ -197,22 +206,12 @@ def _test_all():
     return _lint() + _test()
 
 
-def _big_text(text):
-    """Render huge ASCII text.
-
-    :return: the formatted text
-    :rtype: :class:`str`
-    """
-    from pyfiglet import Figlet
-    return Figlet(font='starwars').renderText(text)
-
-
 ## Tasks
 
 @task
-@needs('html', 'minilib', 'generate_setup', 'setuptools.command.sdist')
+@needs('doc_html', 'setuptools.command.sdist')
 def sdist():
-    """Builds the documentation and the tarball."""
+    """Build the HTML docs and the tarball."""
     pass
 
 
@@ -236,10 +235,24 @@ def test_all():
     """Perform a style check and run all unit tests."""
     retcode = _test_all()
     if retcode == 0:
-        print_success_message(_big_text('PASSED'))
+        print_passed()
     else:
-        print_failure_message(_big_text('FAILED'))
+        print_failed()
     raise SystemExit(retcode)
+
+
+@task
+@consume_args
+def run(args):
+    """Run the package's main script. All arguments are passed to it."""
+    # The main script expects to get the called executable's name as
+    # argv[0]. However, paver doesn't provide that in args. Even if it did (or
+    # we dove into sys.argv), it wouldn't be useful because it would be paver's
+    # executable. So we just pass the package name in as the executable name,
+    # since it's close enough. This should never be seen by an end user
+    # installing through Setuptools anyway.
+    from ecs.main import _main
+    raise SystemExit(_main([CODE_DIRECTORY] + args))
 
 
 @task
@@ -261,16 +274,16 @@ def coverage():
             'Install the pytest coverage plugin to use this task, '
             "i.e., `pip install pytest-cov'.")
         raise SystemExit(1)
-        import pytest
-        pytest.main(['--cov', CODE_DIRECTORY,
-                     '--cov-report', 'term-missing',
-                     TESTS_DIRECTORY])
+    import pytest
+    pytest.main(PYTEST_FLAGS + [
+        '--cov', CODE_DIRECTORY,
+        '--cov-report', 'term-missing',
+        TESTS_DIRECTORY])
 
 
 @task  # NOQA
 def doc_watch():
-    ('Watch for changes in the Sphinx documentation and rebuild when '
-     'changed.')
+    """Watch for changes in the docs and rebuild HTML docs when changed."""
     try:
         from watchdog.events import FileSystemEventHandler
         from watchdog.observers import Observer
@@ -297,13 +310,13 @@ def doc_watch():
         def on_modified(self, event):
             print_failure_message('Modification detected. Rebuilding docs.')
             # # Strip off the path prefix.
+            # import os
             # if event.src_path[len(os.getcwd()) + 1:].startswith(
             #         CODE_DIRECTORY):
             #     # sphinx-build doesn't always pick up changes on code files,
             #     # even though they are used to generate the documentation. As
             #     # a workaround, just clean before building.
-            #     paver.doctools.doc_clean()
-            paver.doctools.html()
+            doc_html()
             print_success_message('Docs have been rebuilt.')
 
     print_success_message(
@@ -321,10 +334,10 @@ def doc_watch():
 
 
 @task
-@needs(['html'])
+@needs('doc_html')
 def doc_open():
     """Build the HTML docs and open them in a web browser."""
-    doc_index = 'docs/build/html/index.html'
+    doc_index = os.path.join(DOCS_DIRECTORY, 'build', 'html', 'index.html')
     if sys.platform == 'darwin':
         # Mac OS X
         subprocess.check_call(['open', doc_index])
@@ -346,3 +359,21 @@ def get_tasks():
     from paver.tasks import environment
     for task in environment.get_tasks():
         print(task.shortname)
+
+
+@task
+def doc_html():
+    """Build the HTML docs."""
+    retcode = _doc_make('html')
+
+    if retcode:
+        raise SystemExit(retcode)
+
+
+@task
+def doc_clean():
+    """Clean (delete) the built docs."""
+    retcode = _doc_make('clean')
+
+    if retcode:
+        raise SystemExit(retcode)

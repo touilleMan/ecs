@@ -1,8 +1,11 @@
-# Python
-*.py[cod]
+# Emacs rope configuration
+.ropeproject
+.project
+.pydevproject
+.settings
 
-## C extensions
-*.so
+# Python
+*.py[co]
 
 ## Packages
 *.egg
@@ -14,11 +17,9 @@ parts
 bin
 var
 sdist
+deb_dist
 develop-eggs
 .installed.cfg
-lib
-lib64
-__pycache__
 
 ## Installer logs
 pip-log.txt
@@ -26,25 +27,9 @@ pip-log.txt
 ## Unit test / coverage reports
 .coverage
 .tox
-nosetests.xml
 
 ## Translations
 *.mo
 
-## Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-
-# Mac file-system crud
-.DS_Store
-
-# IDE configs
-.ropeproject
-.project
-.pydevproject
-.settings
-
-# paver-generated files
-/setup.py
+## paver generated files
 /paver-minilib.zip
