@@ -28,8 +28,7 @@ setup_dict = dict(
     # Find a list of classifiers here:
     # <http://pypi.python.org/pypi?%3Aaction=list_classifiers>
     classifiers=[
-        'Development Status :: 1 - Planning',
-        'Environment :: Console',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
@@ -38,10 +37,8 @@ setup_dict = dict(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: Implementation :: PyPy',
-        'Topic :: Documentation',
-        'Topic :: Software Development :: Libraries :: Python Modules',
-        'Topic :: System :: Installation/Setup',
-        'Topic :: System :: Software Distribution',
+        'Topic :: Games/Entertainment',
+        'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
     packages=find_packages(),
     install_requires=[],
