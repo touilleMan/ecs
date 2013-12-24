@@ -1,26 +1,32 @@
 API Documentation
 =================
 
-:mod:`entity` Module
+:mod:`ecs` Package
+------------------
+
+.. automodule:: ecs.__init__
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`exceptions` Module
+------------------------
+
+.. automodule:: ecs.exceptions
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+:mod:`managers` Module
+----------------------
+
+.. automodule:: ecs.managers
+    :members:
+    :undoc-members:
+
+:mod:`models` Module
 --------------------
 
-.. automodule:: ecs.entity
+.. automodule:: ecs.models
     :members:
     :undoc-members:
-    :show-inheritance:
-
-:mod:`component` Module
------------------------
-
-.. automodule:: ecs.component
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-:mod:`system` Module
---------------------
-
-.. automodule:: ecs.system
-    :members:
-    :undoc-members:
-    :show-inheritance:
