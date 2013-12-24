@@ -4,9 +4,6 @@
 ecs
 ===
 
-Summary
--------
-
 .. image:: https://travis-ci.org/seanfisk/ecs.png
    :target: https://travis-ci.org/seanfisk/ecs
 
