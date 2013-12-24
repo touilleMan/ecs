@@ -1,4 +1,4 @@
-include README.rst
+include README.md
 recursive-include docs *
 recursive-include tests *
 include pavement.py
