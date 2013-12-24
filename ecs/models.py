@@ -12,30 +12,13 @@ class Entity(object):
         """
         self._guid = guid
 
-    def __str__(self):
-        """Stringify.
-
-        :return: GUID as a string
-        :rtype: :class:`str`
-        """
-        return str(self._guid)
+    def __repr__(self):
+        return '{0}({1})'.format(type(self).__name__, self._guid)
 
     def __hash__(self):
-        """Hash function for this object.
-
-        :return: the hash value
-        :rtype: :class:`int`
-        """
         return self._guid
 
     def __eq__(self, other):
-        """Equality method.
-
-        :param other: other entity
-        :type other: :class:`Entity`
-        :return: ``True`` if equal
-        :rtype: :class:`bool`
-        """
         return self._guid == hash(other)
 
 
