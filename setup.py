@@ -23,7 +23,7 @@ setup_dict = dict(
     maintainer_email=metadata.emails[0],
     url=metadata.url,
     description=metadata.description,
-    long_description=read('README.md'),
+    long_description=read('README.rst'),
     download_url=metadata.url,
     # Find a list of classifiers here:
     # <http://pypi.python.org/pypi?%3Aaction=list_classifiers>
