@@ -209,13 +209,6 @@ def _test_all():
 ## Tasks
 
 @task
-@needs('doc_html', 'setuptools.command.sdist')
-def sdist():
-    """Build the HTML docs and the tarball."""
-    pass
-
-
-@task
 def test():
     """Run the unit tests."""
     raise SystemExit(_test())
