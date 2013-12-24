@@ -1,6 +1,9 @@
 ecs
 ===
 
+.. image:: https://travis-ci.org/seanfisk/ecs.png
+   :target: https://travis-ci.org/seanfisk/ecs
+
 A python entity-system-component library for games.
 
 There are many articles on the internet advocating a switch to entity-based systems for game logic.  However, most authors seem to burn themselves out telling why the old inheritance-based approach is problematic, and how an entity system will solve your problems, without ever really explaining what it is or how to do it.
