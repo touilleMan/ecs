@@ -86,7 +86,8 @@ entity_manager.pairs_for_type(Renderable):
         :rtype: :class:`tuple` of (:class:`int`, :class:`ecs.models.Component`)
         """
         try:
-            return self._database[component_type].items()
+            # Return a copy of the items for Python 3.
+            return list(self._database[component_type].items())
         except KeyError:
             return []
 
@@ -117,9 +118,12 @@ entity_manager.pairs_for_type(Renderable):
         :param entity_id: entity GUID
         :type entity_id: :class:`int`
         """
-        # Don't use iterkeys(), otherwise we will get a RuntimeError about
-        # mutating the length of the dictionary at runtime.
-        for comp_type in self._database.keys():
+        # For Python 2, don't use iterkeys(), otherwise we will get a
+        # RuntimeError about mutating the length of the dictionary at runtime.
+        # For Python 3, we can't even use keys(), because that is a view object
+        # that acts like iterkeys(). We therefore make a copy using list() to
+        # avoid modifying the iterator.
+        for comp_type in list(self._database.keys()):
             try:
                 del self._database[comp_type][entity_id]
                 if self._database[comp_type] == {}:

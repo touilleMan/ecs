@@ -18,12 +18,12 @@ class TestEntityManager(object):
 
     @fixture
     def entities(self, manager):
-        return [manager.create_entity() for _ in xrange(5)]
+        return [manager.create_entity() for _ in range(5)]
 
     @fixture
     def component_types(self):
         return [
-            type('Component' + str(i), (Component,), {}) for i in xrange(5)]
+            type('Component' + str(i), (Component,), {}) for i in range(5)]
 
     @fixture
     def components(self, component_types):
@@ -41,7 +41,7 @@ class TestEntityManager(object):
         # We should not test the implementation of the "hash", but just ensure
         # that entities of different IDs are being generated.
         num = 100
-        entities = set([manager.create_entity() for _ in xrange(num)])
+        entities = set([manager.create_entity() for _ in range(num)])
         assert len(entities) == num
 
     class TestPairsForType(object):
@@ -105,7 +105,8 @@ class TestEntityManager(object):
                 manager.component_for_entity(entities[3], component_types[1])
             assert_exc_info_msg(
                 exc_info,
-                "Nonexistent component type: `Component1' for entity: `3'")
+                "Nonexistent component type: "
+                "`Component1' for entity: `Entity(3)'")
 
     def test_remove_entity(
             self, manager, entities, components, component_types):
@@ -124,7 +125,7 @@ class TestSystemManager(object):
             type('System' + str(i),
                  (System,),
                  {'update': MagicMock()})
-            for i in xrange(5)]
+            for i in range(5)]
 
     @fixture
     def systems(self, system_types):
