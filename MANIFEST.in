@@ -1,7 +1,16 @@
+# Informational files
 include README.rst
 include LICENSE
-recursive-include docs *
-recursive-include tests *
+
+# Docs and tests
+graft docs
+prune docs/build
+graft tests
+
+# Exclude any compile Python files grafted by tests/ directory.
+global-exclude *.pyc
+
+# Setup-related things
 include pavement.py
 include requirements-dev.txt
 include requirements.txt
