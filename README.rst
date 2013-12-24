@@ -1,5 +1,5 @@
 .. -*- coding: utf-8; -*-
-.. UTF-8 is used for the em dash and the hair space. Check out <http://csswizardry.com/2010/01/the-three-types-of-dash/>
+.. UTF-8 is used for the em dash, en dash, and the hair space. Check out <http://csswizardry.com/2010/01/the-three-types-of-dash/>
 
 ecs
 ===
@@ -54,7 +54,7 @@ The real action happens in the ``update()`` method of your subclassed ``System``
 Compatibility
 -------------
 
-ecs is compatible with CPython 2.6, 2.7, 3.3, and PyPy 2.2.0. CPython 3.0-3.2 may also work, but Python 3 users are encouraged to upgrade to Python 3.3. Tests ensuring compatibility are run continuously on Travis-CI_ and can also be run locally using tox_.
+ecs is compatible with CPython 2.6, 2.7, 3.3, and PyPy 2.2.0. CPython 3.0–3.2 may also work, but Python 3 users are encouraged to upgrade to Python 3.3. Tests ensuring compatibility are run continuously on Travis-CI_ and can also be run locally using tox_.
 
 .. _Travis-CI: https://travis-ci.org/seanfisk/ecs
 .. _tox: http://tox.readthedocs.org/en/latest/
