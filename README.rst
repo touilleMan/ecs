@@ -25,13 +25,13 @@ Concepts
 
 **ecs** stands for **Entity**, **Component**, and **System**. Each of these parts is important. So what are these?
 
-Entity
+**Entity**
     Simply a unique identifier, used to label components as belonging to a logical grouping.
 
-Component
+**Component**
     A collection of data. Has no behavior associated with it.
 
-System
+**System**
     Piece of code to operate on data in components for a single frame.
 
 Details
