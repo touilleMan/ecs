@@ -1,4 +1,4 @@
-"""An entity system in Python."""
+"""An entity/component system library for games"""
 
 from ecs import metadata
 
