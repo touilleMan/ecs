@@ -10,7 +10,7 @@ pep8==1.4.6
 pyflakes==0.7.3
 
 # Documentation
-Sphinx==1.2
+Sphinx==1.2b3
 docutils==0.11
 Jinja2==2.7.1
 MarkupSafe==0.18
