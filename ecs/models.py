@@ -34,12 +34,15 @@ class System(object):
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def update(self, dt):
+    def update(self, entity_manager, dt):
         """Run the system for this frame. This method is called by the system
         manager, and is where the functionality of the system is implemented.
 
+        :param entity_manager: this system's entity manager, used for
+            querying components
+        :type entity_manager: :class:`ecs.managers.EntityManager`
         :param dt: delta time, or elapsed time for this frame
         :type dt: :class:`float`
         """
-        print("System's update() method was called "
-              "with time delta of {}".format(dt))
+        print("System's update() method was called: "
+              "entity_manager={0}, dt={1}".format(entity_manager, dt))

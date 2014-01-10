@@ -1,7 +1,7 @@
 from pytest import fixture, raises
 import pytest
 usefixtures = pytest.mark.usefixtures
-from mock import MagicMock
+from mock import MagicMock, sentinel
 
 from ecs.models import Component, System
 from ecs.managers import EntityManager, SystemManager
@@ -153,6 +153,6 @@ class TestSystemManager(object):
         assert manager.systems == systems[1:]
 
     def test_update(self, manager, systems):
-        manager.update(20)
+        manager.update(sentinel.entity_manager, 20)
         for system in systems:
-            system.update.assert_called_once_with(20)
+            system.update.assert_called_once_with(sentinel.entity_manager, 20)

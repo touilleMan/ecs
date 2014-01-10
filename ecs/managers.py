@@ -169,9 +169,12 @@ class SystemManager(object):
         self._systems.remove(self._system_types[system_type])
         del self._system_types[system_type]
 
-    def update(self, dt):
+    def update(self, entity_manager, dt):
         """Run all systems in order, for this frame.
 
+        :param entity_manager: this system manager's entity manager, used for
+            querying components
+        :type entity_manager: :class:`EntityManager`
         :param dt: delta time, or elapsed time for this frame
         :type dt: :class:`float`
         """
@@ -179,4 +182,4 @@ class SystemManager(object):
         # noticeably faster. We maintain a list in addition to a dictionary
         # specifically for this purpose.
         for system in self._systems:
-            system.update(dt)
+            system.update(entity_manager, dt)
