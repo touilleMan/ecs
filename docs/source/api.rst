@@ -6,7 +6,6 @@ API Documentation
 
 .. automodule:: ecs.__init__
     :members:
-    :undoc-members:
     :show-inheritance:
 
 :mod:`models` Module
@@ -14,19 +13,16 @@ API Documentation
 
 .. automodule:: ecs.models
     :members:
-    :undoc-members:
 
 :mod:`managers` Module
 ----------------------
 
 .. automodule:: ecs.managers
     :members:
-    :undoc-members:
 
 :mod:`exceptions` Module
 ------------------------
 
 .. automodule:: ecs.exceptions
     :members:
-    :undoc-members:
     :show-inheritance:
