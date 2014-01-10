@@ -9,13 +9,12 @@ API Documentation
     :undoc-members:
     :show-inheritance:
 
-:mod:`exceptions` Module
-------------------------
+:mod:`models` Module
+--------------------
 
-.. automodule:: ecs.exceptions
+.. automodule:: ecs.models
     :members:
     :undoc-members:
-    :show-inheritance:
 
 :mod:`managers` Module
 ----------------------
@@ -24,9 +23,10 @@ API Documentation
     :members:
     :undoc-members:
 
-:mod:`models` Module
---------------------
+:mod:`exceptions` Module
+------------------------
 
-.. automodule:: ecs.models
+.. automodule:: ecs.exceptions
     :members:
     :undoc-members:
+    :show-inheritance:
