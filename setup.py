@@ -192,15 +192,6 @@ class TestAllCommand(TestCommand):
         raise SystemExit(_test_all())
 
 
-# define install_requires for specific Python versions
-python_version_specific_requires = []
-
-# as of Python >= 2.7 and >= 3.2, the argparse module is maintained within
-# the Python standard library, otherwise we install it as a separate package
-if sys.version_info < (2, 7) or (3, 0) <= sys.version_info < (3, 3):
-    python_version_specific_requires.append('argparse')
-
-
 # See here for more options:
 # <http://pythonhosted.org/setuptools/setuptools.html>
 setup_dict = dict(
