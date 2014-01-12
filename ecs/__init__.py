@@ -1,4 +1,4 @@
-"""An entity/component system library for games"""
+"""An entity/component system library for games."""
 
 from ecs import metadata
 

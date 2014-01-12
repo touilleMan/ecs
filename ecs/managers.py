@@ -33,13 +33,12 @@ class EntityManager(object):
         self._next_guid += 1
         return entity
 
-    def add_component(self, entity_id, component_instance):
-        """Add a component to the database and associates it with the given
-        ``entity_id``. ``entity_id`` can be an :class:`ecs.models.Entity`
-        object or a plain :class:`int`.
+    def add_component(self, entity, component_instance):
+        """Add a component to the database and associate it with the given
+        entity.
 
-        :param entity_id: GUID of the entity
-        :type entity_id: :class:`int` or :class:`ecs.models.Entity`
+        :param entity: entity to associate
+        :type entity: :class:`ecs.models.Entity`
         :param component_instance: component to add to the entity
         :type component_instance: :class:`ecs.models.Component`
         """
@@ -47,28 +46,29 @@ class EntityManager(object):
         if component_type not in self._database:
             self._database[component_type] = {}
 
-        self._database[component_type][entity_id] = component_instance
+        self._database[component_type][entity] = component_instance
 
-    def remove_component(self, entity_id, component_type):
+    def remove_component(self, entity, component_type):
         """Remove the component of ``component_type`` associated with
-        ``entity_id`` from the database. Doesn't do any kind of data-teardown.
-        It is up to the system calling this code to do that. In the future,
-        a callback system may be used to implement type-specific destructors.
+        entity from the database. Doesn't do any kind of data-teardown. It is
+        up to the system calling this code to do that. In the future, a
+        callback system may be used to implement type-specific destructors.
 
-        :param entity_id: GUID of the entity
-        :type entity_id: :class:`int`
-        :param component_type: component to remove from the entity
-        :type component_type: :class:`ecs.models.Component`
+        :param entity: entity to associate
+        :type entity: :class:`ecs.models.Entity`
+        :param component_type: component type to remove from the entity
+        :type component_type: :class:`type` which is :class:`Component`
+            subclass
         """
         try:
-            del self._database[component_type][entity_id]
+            del self._database[component_type][entity]
             if self._database[component_type] == {}:
                 del self._database[component_type]
         except KeyError:
             pass
 
     def pairs_for_type(self, component_type):
-        """Return a list of ``(entity_id, component_instance)`` tuples for all
+        """Return a list of ``(entity, component_instance)`` tuples for all
         entities in the database possessing a component of ``component_type``.
         Return an empty list if there are no components of this type in the
         database. Can use in a loop like this, where ``Renderable`` is a
@@ -81,9 +81,11 @@ entity_manager.pairs_for_type(Renderable):
                 pass # do something
 
         :param component_type: a type of created component
-        :type component_type: :class:`type`
-        :return: list of ``(entity_id, component_instance)`` tuples
-        :rtype: :class:`tuple` of (:class:`int`, :class:`ecs.models.Component`)
+        :type component_type: :class:`type` which is :class:`Component`
+            subclass
+        :return: list of ``(entity, component_instance)`` tuples
+        :rtype: :class:`tuple` of
+            (:class:`ecs.models.Entity`, :class:`ecs.models.Component`)
         """
         try:
             # Return a copy of the items for Python 3.
@@ -91,32 +93,33 @@ entity_manager.pairs_for_type(Renderable):
         except KeyError:
             return []
 
-    def component_for_entity(self, entity_id, component_type):
-        """Return the instance of ``component_type`` for the ``entity_id``
-        from the database.
+    def component_for_entity(self, entity, component_type):
+        """Return the instance of ``component_type`` for the entity from the
+        database.
 
-        :param entity_id: entity GUID
-        :type entity_id: :class:`int`
+        :param entity: associated entity
+        :type entity: :class:`ecs.models.Entity`
         :param component_type: a type of created component
-        :type component_type: :class:`type`
-        :return: list of ``(entity_id, component_instance)`` tuples
-        :rtype: :class:`tuple` of (:class:`int`, :class:`ecs.models.Component`)
-        :raises: :exc:`NonexistentComponentTypeForEntity` when \
-        ``component_type`` does not exist on ``entity_instance``
+        :type component_type: :class:`type` which is :class:`Component`
+            subclass
+        :return: component instance
+        :rtype: :class:`ecs.models.Component`
+        :raises: :exc:`NonexistentComponentTypeForEntity` when
+            ``component_type`` does not exist on the given entity
         """
         try:
-            return self._database[component_type][entity_id]
+            return self._database[component_type][entity]
         except KeyError:
             raise NonexistentComponentTypeForEntity(
-                entity_id, component_type)
+                entity, component_type)
 
-    def remove_entity(self, entity_id):
+    def remove_entity(self, entity):
         """Remove all components from the database that are associated with
-        ``entity_id``, with the side-effect that the entity is also no longer
+        the entity, with the side-effect that the entity is also no longer
         in the database.
 
-        :param entity_id: entity GUID
-        :type entity_id: :class:`int`
+        :param entity: entity to remove
+        :type entity: :class:`ecs.models.Entity`
         """
         # For Python 2, don't use iterkeys(), otherwise we will get a
         # RuntimeError about mutating the length of the dictionary at runtime.
@@ -125,7 +128,7 @@ entity_manager.pairs_for_type(Renderable):
         # avoid modifying the iterator.
         for comp_type in list(self._database.keys()):
             try:
-                del self._database[comp_type][entity_id]
+                del self._database[comp_type][entity]
                 if self._database[comp_type] == {}:
                     del self._database[comp_type]
             except KeyError:
@@ -170,7 +173,8 @@ class SystemManager(object):
         del self._system_types[system_type]
 
     def update(self, entity_manager, dt):
-        """Run all systems in order, for this frame.
+        """Run each system's ``update()`` method for this frame. The systems
+        are run in the order in which they were added.
 
         :param entity_manager: this system manager's entity manager, used for
             querying components
