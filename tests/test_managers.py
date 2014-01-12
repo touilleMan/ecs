@@ -27,7 +27,8 @@ class TestEntityManager(object):
 
     @fixture
     def components(self, component_types):
-        return [type_() for type_ in component_types]
+        # The last item is another component of type 0.
+        return [type_() for type_ in component_types] + [component_types[0]()]
 
     @fixture(autouse=True)
     def setup_pairs(self, manager, entities, components):
@@ -35,7 +36,7 @@ class TestEntityManager(object):
         manager.add_component(entities[3], components[0])
         manager.add_component(entities[3], components[4])
         manager.add_component(entities[4], components[3])
-        manager.add_component(entities[1], components[0])
+        manager.add_component(entities[1], components[5])
 
     def test_create_new_entities(self, manager):
         # We should not test the implementation of the "hash", but just ensure
@@ -49,7 +50,7 @@ class TestEntityManager(object):
                 self, manager, entities, components, component_types):
             assert manager.pairs_for_type(component_types[0]) == [
                 (entities[0], components[0]),
-                (entities[1], components[0]),
+                (entities[1], components[5]),
                 (entities[3], components[0])]
 
         def test_nonexistent_component_type(
@@ -63,7 +64,7 @@ class TestEntityManager(object):
             assert manager.database == {
                 component_types[0]: {
                     entities[0]: components[0],
-                    entities[1]: components[0],
+                    entities[1]: components[5],
                 },
                 component_types[3]: {
                     entities[4]: components[3],
@@ -80,7 +81,7 @@ class TestEntityManager(object):
                 component_types[0]: {
                     entities[0]: components[0],
                     entities[3]: components[0],
-                    entities[1]: components[0],
+                    entities[1]: components[5],
                 },
                 component_types[3]: {
                     entities[4]: components[3],
@@ -113,7 +114,7 @@ class TestEntityManager(object):
         manager.remove_entity(entities[3])
         assert manager.database == {
             component_types[0]: {
-                entities[0]: components[0], entities[1]: components[0]},
+                entities[0]: components[0], entities[1]: components[5]},
             component_types[3]: {entities[4]: components[3]},
         }
 
