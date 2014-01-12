@@ -15,7 +15,7 @@ The library is called an "entity/component system" library rather than an "entit
 
 The module is called ``ecs``. ``ces`` is too close to something else, and while there is another library called ``ecs``, it's for an E-Commerce service from Amazon and is unlikely to name-clash in your projects.
 
-As this module is in somewhat rarefied air, with not a lot of company, the concepts and API will change often during development.  Inspiration is taken from the `Ash framework`_ for ActionScript 3.0 and `Artemis framework`_ for Java.
+As this module is in somewhat rarefied air, with not a lot of company, the concepts and API may change during development. Inspiration is taken from the `Ash framework`_ for ActionScript 3.0 and `Artemis framework`_ for Java.
 
 .. _Ash framework: http://www.ashframework.org/
 .. _Artemis framework: http://gamadu.com/artemis/index.html
