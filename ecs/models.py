@@ -3,6 +3,8 @@
 from __future__ import print_function
 from abc import ABCMeta, abstractmethod
 
+import six
+
 
 class Entity(object):
     """Encapsulation of a GUID to use in the entity database."""
@@ -27,12 +29,11 @@ class Component(object):
     pass
 
 
+@six.add_metaclass(ABCMeta)
 class System(object):
     """An object that represents an operation on a set of objects from the game
     database. The :meth:`update` method must be implemented.
     """
-    __metaclass__ = ABCMeta
-
     @abstractmethod
     def update(self, entity_manager, dt):
         """Run the system for this frame. This method is called by the system
@@ -44,5 +45,5 @@ class System(object):
         :param dt: delta time, or elapsed time for this frame
         :type dt: :class:`float`
         """
-        print("System's update() method was called: "
-              "entity_manager={0}, dt={1}".format(entity_manager, dt))
+        six.print_("System's update() method was called: "
+                   'entity_manager={0}, dt={1}'.format(entity_manager, dt))

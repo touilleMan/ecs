@@ -1,3 +1,5 @@
+--requirement requirements.txt
+
 # Testing
 pytest==2.5.1
 py==1.4.19

@@ -221,7 +221,7 @@ setup_dict = dict(
         'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
     packages=find_packages(),
-    install_requires=[],
+    install_requires=['six==1.5.2'],
     # Allow tests to be run with `python setup.py test'.
     tests_require=[
         'pytest==2.5.1',

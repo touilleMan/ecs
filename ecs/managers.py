@@ -1,5 +1,7 @@
 """Entity and System Managers."""
 
+import six
+
 from ecs.exceptions import (
     NonexistentComponentTypeForEntity, DuplicateSystemTypeError)
 from ecs.models import Entity
@@ -68,11 +70,11 @@ class EntityManager(object):
             pass
 
     def pairs_for_type(self, component_type):
-        """Return a list of ``(entity, component_instance)`` tuples for all
-        entities in the database possessing a component of ``component_type``.
-        Return an empty list if there are no components of this type in the
-        database. Can use in a loop like this, where ``Renderable`` is a
-        component type:
+        """Return an iterator over ``(entity, component_instance)`` tuples for
+        all entities in the database possessing a component of
+        ``component_type``. Return an empty iterator if there are no components
+        of this type in the database. It should be used in a loop like this,
+        where ``Renderable`` is a component type:
 
         .. code-block:: python
 
@@ -83,15 +85,14 @@ entity_manager.pairs_for_type(Renderable):
         :param component_type: a type of created component
         :type component_type: :class:`type` which is :class:`Component`
             subclass
-        :return: list of ``(entity, component_instance)`` tuples
-        :rtype: :class:`tuple` of
+        :return: iterator on ``(entity, component_instance)`` tuples
+        :rtype: :class:`iter` on
             (:class:`ecs.models.Entity`, :class:`ecs.models.Component`)
         """
         try:
-            # Return a copy of the items for Python 3.
-            return list(self._database[component_type].items())
+            return six.iteritems(self._database[component_type])
         except KeyError:
-            return []
+            return six.iteritems({})
 
     def component_for_entity(self, entity, component_type):
         """Return the instance of ``component_type`` for the entity from the

@@ -48,14 +48,14 @@ class TestEntityManager(object):
     class TestPairsForType(object):
         def test_existing_component_type(
                 self, manager, entities, components, component_types):
-            assert manager.pairs_for_type(component_types[0]) == [
+            assert list(manager.pairs_for_type(component_types[0])) == [
                 (entities[0], components[0]),
                 (entities[1], components[5]),
                 (entities[3], components[0])]
 
         def test_nonexistent_component_type(
                 self, manager, entities, component_types):
-            assert manager.pairs_for_type(component_types[2]) == []
+            assert list(manager.pairs_for_type(component_types[2])) == []
 
     class TestRemoveComponent(object):
         def test_remove_some_of_a_component(

@@ -1,0 +1,2 @@
+# For Python 2/3 compatibility
+six==1.5.2
