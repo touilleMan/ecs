@@ -138,9 +138,13 @@ entity_manager.pairs_for_type(Renderable):
 
 class SystemManager(object):
     """A container and manager for :class:`ecs.models.System` objects."""
-    def __init__(self):
+    def __init__(self, entity_manager):
+        """:param entity_manager: this manager's entity manager
+        :type entity_manager: :class:`SystemManager`
+        """
         self._systems = []
         self._system_types = {}
+        self._entity_manager = entity_manager
 
     # Allow getting the list of systems but not directly setting it.
     @property
@@ -161,6 +165,7 @@ class SystemManager(object):
         system_type = type(system_instance)
         if system_type in self._system_types:
             raise DuplicateSystemTypeError(system_type)
+        system_instance.entity_manager = self._entity_manager
         self._system_types[system_type] = system_instance
         self._systems.append(system_instance)
 
@@ -170,21 +175,24 @@ class SystemManager(object):
         :param system_type: type of system to remove
         :type system_type: :class:`type`
         """
-        self._systems.remove(self._system_types[system_type])
+        system = self._system_types[system_type]
+        system.entity_manager = None
+        self._systems.remove(system)
         del self._system_types[system_type]
 
-    def update(self, entity_manager, dt):
+    def update(self, dt):
         """Run each system's ``update()`` method for this frame. The systems
         are run in the order in which they were added.
 
-        :param entity_manager: this system manager's entity manager, used for
-            querying components
-        :type entity_manager: :class:`EntityManager`
         :param dt: delta time, or elapsed time for this frame
         :type dt: :class:`float`
         """
         # Iterating over a list of systems instead of values in a dictionary is
         # noticeably faster. We maintain a list in addition to a dictionary
         # specifically for this purpose.
+        #
+        # Though initially we had the entity manager being passed through to
+        # each update() method, this turns out to cause quite a large
+        # performance penalty. So now it is just set on each system.
         for system in self._systems:
-            system.update(entity_manager, dt)
+            system.update(dt)

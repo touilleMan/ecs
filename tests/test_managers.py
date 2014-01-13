@@ -134,26 +134,35 @@ class TestSystemManager(object):
 
     @fixture
     def manager(self, systems):
-        sm = SystemManager()
+        sm = SystemManager(sentinel.entity_manager)
         for system in systems:
             sm.add_system(system)
         return sm
 
     class TestAddSystem(object):
-        def test_normal_usage(self, manager, systems):
+        def test_systems_added(self, manager, systems):
             # add_system was called normally in the fixture.
             assert manager.systems == systems
+
+        def test_entity_manager_set(self, manager):
+            for system in manager.systems:
+                assert system.entity_manager == sentinel.entity_manager
 
         def test_duplicate(self, manager, systems, system_types):
             with raises(DuplicateSystemTypeError) as exc_info:
                 manager.add_system(systems[1])
             assert_exc_info_msg(exc_info, "Duplicate system type: `System1'")
 
-    def test_remove_system(self, manager, systems, system_types):
-        manager.remove_system(system_types[0])
-        assert manager.systems == systems[1:]
+    class TestRemoveSystem(object):
+        def test_remove_system(self, manager, systems, system_types):
+            manager.remove_system(system_types[0])
+            assert manager.systems == systems[1:]
+
+        def test_entity_manager_unset(self, manager, systems, system_types):
+            manager.remove_system(system_types[0])
+            assert systems[0].entity_manager is None
 
     def test_update(self, manager, systems):
-        manager.update(sentinel.entity_manager, 20)
+        manager.update(20)
         for system in systems:
-            system.update.assert_called_once_with(sentinel.entity_manager, 20)
+            system.update.assert_called_once_with(20)

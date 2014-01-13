@@ -33,8 +33,16 @@ class System(object):
     """An object that represents an operation on a set of objects from the game
     database. The :meth:`update` method must be implemented.
     """
+    def __init__(self):
+        self.entity_manager = None
+        """This system's entity manager. It is set for each system when it is
+        added to a system manager, so a system may not (reasonably) use
+        multiple entity managers. The reason is performance. See
+        :meth:`ecs.managers.SystemManager.update()` for more information.
+        """
+
     @abstractmethod
-    def update(self, entity_manager, dt):
+    def update(self, dt):
         """Run the system for this frame. This method is called by the system
         manager, and is where the functionality of the system is implemented.
 
@@ -44,5 +52,4 @@ class System(object):
         :param dt: delta time, or elapsed time for this frame
         :type dt: :class:`float`
         """
-        six.print_("System's update() method was called: "
-                   'entity_manager={0}, dt={1}'.format(entity_manager, dt))
+        six.print_("System's update() method was called: dt={}".format(dt))
