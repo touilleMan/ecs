@@ -220,7 +220,7 @@ setup_dict = dict(
         'Topic :: Games/Entertainment',
         'Topic :: Software Development :: Libraries :: Application Frameworks',
     ],
-    packages=find_packages(),
+    packages=find_packages(exclude=(TESTS_DIRECTORY,)),
     install_requires=['six==1.5.2'],
     # Allow tests to be run with `python setup.py test'.
     tests_require=[
