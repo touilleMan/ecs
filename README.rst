@@ -45,7 +45,7 @@ ecs defines a few core core classes:
 * ``EntityManager``
 * ``SystemManager``
 
-The ``Entity`` class is simply a representation of a unique identifier, and is not to be subclassed. The ``Component`` class is intended to be subclassed for your custom components. ``System`` is also intended to be subclassed for your custom components.
+The ``Entity`` class is simply a representation of a unique identifier, and is not to be subclassed. The ``Component`` class is intended to be subclassed for your custom components. ``System`` is also intended to be subclassed for your custom systems.
 
 The ``EntityManager`` is a database that stores ``Component`` subclasses, referenced by their type and entity ID. The ``SystemManager`` maintains a set of ``System`` instances and allows them to perform their operations.
 
