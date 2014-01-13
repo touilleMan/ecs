@@ -1,3 +1,5 @@
+import re
+
 from pytest import fixture, raises
 import pytest
 usefixtures = pytest.mark.usefixtures
@@ -6,7 +8,8 @@ from mock import MagicMock, sentinel
 from ecs.models import Component, System
 from ecs.managers import EntityManager, SystemManager
 from ecs.exceptions import (
-    NonexistentComponentTypeForEntity, DuplicateSystemTypeError)
+    NonexistentComponentTypeForEntity, DuplicateSystemTypeError,
+    SystemAlreadyAddedToManagerError)
 
 from tests.helpers import assert_exc_info_msg
 
@@ -148,10 +151,45 @@ class TestSystemManager(object):
             for system in manager.systems:
                 assert system.entity_manager == sentinel.entity_manager
 
-        def test_duplicate(self, manager, systems, system_types):
-            with raises(DuplicateSystemTypeError) as exc_info:
-                manager.add_system(systems[1])
-            assert_exc_info_msg(exc_info, "Duplicate system type: `System1'")
+        def test_system_manager_set(self, manager):
+            for system in manager.systems:
+                assert system.system_manager == manager
+
+        class TestDuplicate(object):
+            def test_raises_error(self, manager, systems):
+                with raises(DuplicateSystemTypeError) as exc_info:
+                    manager.add_system(systems[1])
+                assert_exc_info_msg(
+                    exc_info, "Duplicate system type: `System1'")
+
+            def test_system_and_entity_managers_not_set(
+                    self, manager, system_types):
+                system = system_types[0]()
+                with raises(DuplicateSystemTypeError):
+                    manager.add_system(system)
+                assert system.entity_manager is None
+                assert system.system_manager is None
+
+        class TestSystemAlreadyAdded(object):
+            def test_raises_error(self, manager, systems):
+                manager2 = SystemManager(sentinel.entity_manager)
+                with raises(SystemAlreadyAddedToManagerError) as exc_info:
+                    manager2.add_system(systems[0])
+                # It's going to format a memory address for each class. We
+                # don't care about that.
+                assert re.match(
+                    "System `.*' which belongs to system manager `.*'"
+                    "attempted to be added to system manager `.*'$",
+                    str(exc_info.value))
+
+            def test_system_and_entity_managers_not_changed(
+                    self, manager, systems):
+                manager2 = SystemManager(sentinel.entity_manager)
+                with raises(SystemAlreadyAddedToManagerError):
+                    manager2.add_system(systems[0])
+
+                assert systems[0].entity_manager == sentinel.entity_manager
+                assert systems[0].system_manager == manager
 
     class TestRemoveSystem(object):
         def test_remove_system(self, manager, systems, system_types):
@@ -161,6 +199,10 @@ class TestSystemManager(object):
         def test_entity_manager_unset(self, manager, systems, system_types):
             manager.remove_system(system_types[0])
             assert systems[0].entity_manager is None
+
+        def test_system_manager_unset(self, manager, systems, system_types):
+            manager.remove_system(system_types[0])
+            assert systems[0].system_manager is None
 
     def test_update(self, manager, systems):
         manager.update(20)

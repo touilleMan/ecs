@@ -3,7 +3,8 @@
 import six
 
 from ecs.exceptions import (
-    NonexistentComponentTypeForEntity, DuplicateSystemTypeError)
+    NonexistentComponentTypeForEntity, DuplicateSystemTypeError,
+    SystemAlreadyAddedToManagerError)
 from ecs.models import Entity
 
 
@@ -161,11 +162,19 @@ class SystemManager(object):
 
         :param system_instance: instance of a system
         :type system_instance: :class:`ecs.models.System`
+        :raises: :class:`ecs.exceptions.DuplicateSystemTypeError` when the
+            system type is already present in this manager
+        :raises: :class:`ecs.exceptions.SystemAlreadyAddedToManagerError` when
+            the system already belongs to a system manager
         """
         system_type = type(system_instance)
         if system_type in self._system_types:
             raise DuplicateSystemTypeError(system_type)
+        if system_instance.system_manager is not None:
+            raise SystemAlreadyAddedToManagerError(
+                system_instance, self, system_instance.system_manager)
         system_instance.entity_manager = self._entity_manager
+        system_instance.system_manager = self
         self._system_types[system_type] = system_instance
         self._systems.append(system_instance)
 
@@ -177,6 +186,7 @@ class SystemManager(object):
         """
         system = self._system_types[system_type]
         system.entity_manager = None
+        system.system_manager = None
         self._systems.remove(system)
         del self._system_types[system_type]
 

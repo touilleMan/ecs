@@ -40,6 +40,9 @@ class System(object):
         multiple entity managers. The reason is performance. See
         :meth:`ecs.managers.SystemManager.update()` for more information.
         """
+        self.system_manager = None
+        """The system manager to which this system belongs. Again, a system is
+        only allowed to belong to one at a time."""
 
     @abstractmethod
     def update(self, dt):
