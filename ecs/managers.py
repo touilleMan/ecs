@@ -157,11 +157,13 @@ class SystemManager(object):
         """
         return self._systems
 
-    def add_system(self, system_instance):
+    def add_system(self, system_instance, priority=0):
         """Add a :class:`ecs.models.System` instance to the manager.
 
         :param system_instance: instance of a system
+        :param priority: non-negative integer (default: 0)
         :type system_instance: :class:`ecs.models.System`
+        :type priority: :class:`int`
         :raises: :class:`ecs.exceptions.DuplicateSystemTypeError` when the
             system type is already present in this manager
         :raises: :class:`ecs.exceptions.SystemAlreadyAddedToManagerError` when
@@ -177,6 +179,9 @@ class SystemManager(object):
         system_instance.system_manager = self
         self._system_types[system_type] = system_instance
         self._systems.append(system_instance)
+
+        system_instance.priority = priority
+        self._systems.sort(key=lambda x: x.priority)
 
     def remove_system(self, system_type):
         """Tell the manager to no longer run the system of this type.
