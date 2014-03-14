@@ -1,4 +1,5 @@
 import re
+import random
 
 from pytest import fixture, raises
 import pytest
@@ -128,7 +129,7 @@ class TestSystemManager(object):
         return [
             type('System' + str(i),
                  (System,),
-                 {'update': MagicMock()})
+                 {'update': MagicMock(), 'order': i})
             for i in range(5)]
 
     @fixture
@@ -139,13 +140,15 @@ class TestSystemManager(object):
     def manager(self, systems):
         sm = SystemManager(sentinel.entity_manager)
         for system in systems:
-            sm.add_system(system)
+            sm.add_system(system, priority=random.randrange(4))
         return sm
 
     class TestAddSystem(object):
         def test_systems_added(self, manager, systems):
             # add_system was called normally in the fixture.
-            assert manager.systems == systems
+            # since add_system sorts the manager.systems
+            # we switch to sets for easy comparing
+            assert set(manager.systems) == set(systems)
 
         def test_entity_manager_set(self, manager):
             for system in manager.systems:
@@ -154,6 +157,20 @@ class TestSystemManager(object):
         def test_system_manager_set(self, manager):
             for system in manager.systems:
                 assert system.system_manager == manager
+
+        class TestPriority(object):
+            def test_obeys_order(self, manager, systems):
+                old_priority = -1
+                old_order = -1
+                for s in manager.systems:
+                    priority = s.priority
+                    order = s.order
+                    assert old_priority <= priority
+                    if priority == old_priority:
+                        assert old_order < order
+
+                    old_priority = priority
+                    old_order = old_order
 
         class TestDuplicate(object):
             def test_raises_error(self, manager, systems):
@@ -194,7 +211,8 @@ class TestSystemManager(object):
     class TestRemoveSystem(object):
         def test_remove_system(self, manager, systems, system_types):
             manager.remove_system(system_types[0])
-            assert manager.systems == systems[1:]
+            # using sets for the same reason as in test_systems_added
+            assert set(manager.systems) == set(systems[1:])
 
         def test_entity_manager_unset(self, manager, systems, system_types):
             manager.remove_system(system_types[0])

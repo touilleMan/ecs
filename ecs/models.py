@@ -43,6 +43,10 @@ class System(object):
         self.system_manager = None
         """The system manager to which this system belongs. Again, a system is
         only allowed to belong to one at a time."""
+        self.priority = None
+        """The priority for this system when the system manager runs
+        :meth:`ecs.managers.SystemManager.update()`. Must be a non-negative
+        integer with 0 being the highest priority."""
 
     @abstractmethod
     def update(self, dt):
